@@ -3,14 +3,31 @@ import $ from 'jquery/src/jquery';
 import Keys from './App.config';
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      sampleList: ['a', 'b', 'c', 'd']
+    };
+
+  };
+
   render() {
     return (
-      <Meme memeUrl="https://i.redd.it/xs8icxq11qdz.jpg"
-            memeText="text"
-            displayTitle="title"/>
+      <div>
+      <SearchBar/>
+        <ul>
+          {this.state.sampleList.map((letter, i) => <Letter key={i} letter={letter}/>)}
+        </ul>
+    </div>
     );
   }
 }
+
+const Letter = ({letter}) => (
+  <li>
+    {letter}
+  </li>
+)
 
 const Meme = ({memeUrl, memeText, displayTitle}) => (
   <div>
@@ -19,6 +36,18 @@ const Meme = ({memeUrl, memeText, displayTitle}) => (
     <img src={memeUrl} alt={memeText}/>
   </div>
 );
+
+const SearchBar = () => {
+  const logStuff = (event) => {
+    if (event.key === "Enter") {
+      console.log($('#sprongle').val())
+    }
+  };
+
+  return (
+    <input id="sprongle" type="text" onKeyPress={logStuff}></input>
+  );
+}
 
 const processMeme = (memeUrl) => {
   let subscriptionKey = Keys.MicrosoftOCR;
