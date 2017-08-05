@@ -1,22 +1,36 @@
 import React, { Component } from 'react';
 import $ from 'jquery/src/jquery';
 import Keys from './App.config';
+import {isUndefined} from 'lodash';
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      sampleList: ['a', 'b', 'c', 'd']
+      sampleList: ['a', 'b', 'c', 'd'],
+      filteredList : ['a','b','c','d']
     };
 
+    this.handleSearch = this.handleSearch.bind(this);
+  };
+
+  handleSearch(filterValue) {
+    if (filterValue){
+      let filteredList = this.state.sampleList.filter((listItem) => {
+        return listItem === filterValue;
+      });
+      this.setState({filteredList: filteredList});
+    } else {
+      this.setState({filteredList: this.state.sampleList});
+    }
   };
 
   render() {
     return (
       <div>
-      <SearchBar/>
+      <SearchBar search={this.handleSearch}/>
         <ul>
-          {this.state.sampleList.map((letter, i) => <Letter key={i} letter={letter}/>)}
+          {this.state.filteredList.map((letter, i) => <Letter key={i} letter={letter}/>)}
         </ul>
     </div>
     );
@@ -37,15 +51,13 @@ const Meme = ({memeUrl, memeText, displayTitle}) => (
   </div>
 );
 
-const SearchBar = () => {
-  const logStuff = (event) => {
-    if (event.key === "Enter") {
-      console.log($('#sprongle').val())
-    }
+const SearchBar = ({search}) => {
+  const doSearch = (event) => {
+    search($('#sprongle').val());
   };
 
   return (
-    <input id="sprongle" type="text" onKeyPress={logStuff}></input>
+    <input id="sprongle" type="text" onKeyUp={doSearch}></input>
   );
 }
 
