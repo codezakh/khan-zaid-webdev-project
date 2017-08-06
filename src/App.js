@@ -1,18 +1,38 @@
 import React, { Component } from 'react';
 import $ from 'jquery/src/jquery';
 import Keys from './App.config';
-import {isUndefined} from 'lodash';
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       sampleList: ['a', 'b', 'c', 'd'],
-      filteredList : ['a','b','c','d']
+      filteredList : ['a','b','c','d'],
+      detailState: {detailInView: false, letterInView:undefined},
     };
 
     this.handleSearch = this.handleSearch.bind(this);
+    this.handleLetterDetail = this.handleLetterDetail.bind(this);
   };
+
+  handleLetterDetail(letter) {
+    let {detailInView, letterInView} = this.state.detailState;
+    if (detailInView && letter === letterInView) {
+      console.log('Toggling letters')
+      this.setState({
+        detailState: {
+          detailInView: false,
+          letterInView: undefined
+        }
+      });
+    } else if (detailInView && letter !== letterInView) {
+      console.log('switching letters');
+      this.setState({detailState: {detailInView: true, letterInView: letter}});
+    } else if (!detailInView) {
+      console.log('switching on')
+      this.setState({detailState: {detailInView: true, letterInView: letter}});
+    }
+  }
 
   handleSearch(filterValue) {
     if (filterValue){
@@ -28,20 +48,53 @@ class App extends Component {
   render() {
     return (
       <div>
-      <SearchBar search={this.handleSearch}/>
+        <SearchBar search={this.handleSearch}/>
         <ul>
-          {this.state.filteredList.map((letter, i) => <Letter key={i} letter={letter}/>)}
+          {this.state.filteredList.map((letter, i) => <Letter key={i}
+                                                              letter={letter}
+                                                              showDetailView={this.handleLetterDetail}/>)}
         </ul>
-    </div>
+        <LetterDetailView detailState={this.state.detailState}/>
+      </div>
     );
   }
 }
 
-const Letter = ({letter}) => (
+const LetterDetailView = ({detailState}) => {
+  let {detailInView, letterInView} = detailState;
+  if (detailInView) {
+    return (
+      <div>
+        You have truly been sprongled by "{letterInView}" my man
+      </div>
+    )
+  } else {
+    return (
+      <div></div>
+    );
+  }
+};
+
+
+
+const Letter = ({letter, showDetailView}) => (
   <li>
+    <div id="{letter}" onClick={()=>showDetailView(letter)}>
     {letter}
+    </div>
   </li>
 )
+
+
+const SearchBar = ({search}) => {
+  return (
+    <input id="memeSearchBox"
+           type="text"
+           onKeyUp={(event) => search($('#memeSearchBox').val())}>
+
+    </input>
+  );
+};
 
 const Meme = ({memeUrl, memeText, displayTitle}) => (
   <div>
@@ -50,16 +103,6 @@ const Meme = ({memeUrl, memeText, displayTitle}) => (
     <img src={memeUrl} alt={memeText}/>
   </div>
 );
-
-const SearchBar = ({search}) => {
-  const doSearch = (event) => {
-    search($('#sprongle').val());
-  };
-
-  return (
-    <input id="sprongle" type="text" onKeyUp={doSearch}></input>
-  );
-}
 
 const processMeme = (memeUrl) => {
   let subscriptionKey = Keys.MicrosoftOCR;
