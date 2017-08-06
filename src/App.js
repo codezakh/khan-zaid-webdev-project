@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import $ from 'jquery/src/jquery';
 import Keys from './App.config';
+import request from 'request-promise-native/lib/rp';
+import 'reddit.js/reddit'
 
 class App extends Component {
   constructor(props) {
@@ -9,10 +11,12 @@ class App extends Component {
       sampleList: ['a', 'b', 'c', 'd'],
       filteredList : ['a','b','c','d'],
       detailState: {detailInView: false, letterInView:undefined},
+      redditPosts: []
     };
 
     this.handleSearch = this.handleSearch.bind(this);
     this.handleLetterDetail = this.handleLetterDetail.bind(this);
+    this.downloadRedditData = this.downloadRedditData.bind(this);
   };
 
   handleLetterDetail(letter) {
@@ -44,6 +48,17 @@ class App extends Component {
       this.setState({filteredList: this.state.sampleList});
     }
   };
+
+  downloadRedditData() {
+    window.reddit.top('deepfriedmemes').t('all').limit(1).fetch(function(res){
+      console.log(res.data.children[0].data.url);
+    })
+  };
+
+  componentDidMount(){
+    var self = this;
+    this.downloadRedditData();
+  }
 
   render() {
     return (
@@ -103,6 +118,7 @@ const Meme = ({memeUrl, memeText, displayTitle}) => (
     <img src={memeUrl} alt={memeText}/>
   </div>
 );
+
 
 const processMeme = (memeUrl) => {
   let subscriptionKey = Keys.MicrosoftOCR;
