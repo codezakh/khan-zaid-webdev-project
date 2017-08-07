@@ -85,7 +85,7 @@ class App extends Component {
         <div>
           <Route path="/swoogity" component={StupidComponent}></Route>
         </div>
-          <Route exact path="/">
+          <Route exact path="/" render={() => (
             <div>
               <SearchBar search={this.handleMemeSearch}/>
               <ul>
@@ -107,6 +107,7 @@ class App extends Component {
                 <Link to="/swoogity">This is a link</Link>
               </div>
             </div>
+          )}>
           </Route>
         </div>
       </Router>
@@ -130,11 +131,10 @@ const LetterDetailView = ({detailState}) => {
 };
 
 
-
 const Letter = ({letter, showDetailView}) => (
   <li>
-    <div id="{letter}" onClick={()=>showDetailView(letter)}>
-    {letter}
+    <div id="{letter}" onClick={() => showDetailView(letter)}>
+      {letter}
     </div>
   </li>
 )
@@ -194,8 +194,8 @@ const processMeme = (memeUrl) => {
     url: uriBase + "?" + $.param(params),
 
     // Request headers.
-    beforeSend: function(jqXHR){
-      jqXHR.setRequestHeader("Content-Type","application/json");
+    beforeSend: function (jqXHR) {
+      jqXHR.setRequestHeader("Content-Type", "application/json");
       jqXHR.setRequestHeader("Ocp-Apim-Subscription-Key", subscriptionKey);
     },
 
@@ -205,13 +205,13 @@ const processMeme = (memeUrl) => {
     data: '{"url": ' + '"' + memeUrl + '"}',
   })
 
-    .done(function(data) {
+    .done(function (data) {
       // Show formatted JSON on webpage.
       console.log(data);
       return "it worked!!!";
     })
 
-    .fail(function(jqXHR, textStatus, errorThrown) {
+    .fail(function (jqXHR, textStatus, errorThrown) {
       // Display error message.
       return "something went wrong"
     });
