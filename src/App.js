@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import $ from 'jquery/src/jquery';
 import Keys from './App.config';
-import request from 'request-promise-native/lib/rp';
 import 'reddit.js/reddit'
 import {parsePosts} from './RedditParser';
+import {Button, Row} from 'react-bootstrap';
+import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
+
 
 class App extends Component {
   constructor(props) {
@@ -78,6 +80,7 @@ class App extends Component {
 
   render() {
     return (
+      <Router>
       <div>
         <SearchBar search={this.handleMemeSearch}/>
         <ul>
@@ -89,11 +92,18 @@ class App extends Component {
         <div>
           <ul>
             {this.state.filteredRedditPosts.map((post, idx) => {
-              return <RedditPostListItem post={post} key={idx}/>
+              return (<Row key={idx}>
+                <RedditPostListItem post={post}/>
+              </Row>);
             })}
           </ul>
         </div>
+        <div>
+          <Link to="/swoogity">This is a link</Link>
+          <Route path="/swoogity" component={StupidComponent}></Route>
+        </div>
       </div>
+      </Router>
     );
   }
 }
@@ -131,6 +141,12 @@ const RedditPostListItem = ({post}) => (
            src={post.thumbnail}
            width="{post.thumbnail_width}"
            height="{post.thumbnail_height}"/>
+
+      <div>
+        <a href="/swoogity">
+          <Button bsStyle="primary">Detail</Button>
+        </a>
+      </div>
     </div>
   </li>
 );
@@ -151,6 +167,12 @@ const Meme = ({memeUrl, memeText, displayTitle}) => (
     <h1>{displayTitle}</h1>
     <p>{memeText}</p>
     <img src={memeUrl} alt={memeText}/>
+  </div>
+);
+
+const StupidComponent = () => (
+  <div>
+    <h1>Just destroy me</h1>
   </div>
 );
 
