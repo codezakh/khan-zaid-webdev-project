@@ -12,10 +12,12 @@ class App extends Component {
       sampleList: ['a', 'b', 'c', 'd'],
       filteredList : ['a','b','c','d'],
       detailState: {detailInView: false, letterInView:undefined},
-      redditPosts: []
+      redditPosts: [],
+      filteredRedditPosts: [],
     };
 
     this.handleSearch = this.handleSearch.bind(this);
+    this.handleMemeSearch = this.handleMemeSearch.bind(this);
     this.handleLetterDetail = this.handleLetterDetail.bind(this);
     this.downloadRedditData = this.downloadRedditData.bind(this);
   };
@@ -50,10 +52,22 @@ class App extends Component {
     }
   };
 
+  handleMemeSearch(searchValue) {
+    if (searchValue){
+      let filteredMemes = this.state.redditPosts.filter((post) => {
+        return post.title.toUpperCase().includes(searchValue.toUpperCase());
+      });
+      this.setState({filteredRedditPosts: filteredMemes});
+    } else {
+      this.setState({filteredRedditPosts: this.state.redditPosts});
+    }
+  };
+
   downloadRedditData() {
     var self = this;
     window.reddit.top('deepfriedmemes').t('all').limit(20).fetch(function(res){
       self.setState({redditPosts: parsePosts(res)});
+      self.setState({filteredRedditPosts: parsePosts(res)});
     })
   };
 
@@ -65,7 +79,7 @@ class App extends Component {
   render() {
     return (
       <div>
-        <SearchBar search={this.handleSearch}/>
+        <SearchBar search={this.handleMemeSearch}/>
         <ul>
           {this.state.filteredList.map((letter, i) => <Letter key={i}
                                                               letter={letter}
@@ -74,7 +88,7 @@ class App extends Component {
         <LetterDetailView detailState={this.state.detailState}/>
         <div>
           <ul>
-            {this.state.redditPosts.map((post, idx) => {
+            {this.state.filteredRedditPosts.map((post, idx) => {
               return <RedditPostListItem post={post} key={idx}/>
             })}
           </ul>
