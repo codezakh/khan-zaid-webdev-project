@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import $ from 'jquery/src/jquery';
+import $ from 'jquery';
 import Keys from './App.config';
 import 'reddit.js/reddit'
 import {parsePosts} from './RedditParser';
@@ -81,28 +81,34 @@ class App extends Component {
   render() {
     return (
       <Router>
-      <div>
-        <SearchBar search={this.handleMemeSearch}/>
-        <ul>
-          {this.state.filteredList.map((letter, i) => <Letter key={i}
-                                                              letter={letter}
-                                                              showDetailView={this.handleLetterDetail}/>)}
-        </ul>
-        <LetterDetailView detailState={this.state.detailState}/>
         <div>
-          <ul>
-            {this.state.filteredRedditPosts.map((post, idx) => {
-              return (<Row key={idx}>
-                <RedditPostListItem post={post}/>
-              </Row>);
-            })}
-          </ul>
-        </div>
         <div>
-          <Link to="/swoogity">This is a link</Link>
           <Route path="/swoogity" component={StupidComponent}></Route>
         </div>
-      </div>
+          <Route exact path="/">
+            <div>
+              <SearchBar search={this.handleMemeSearch}/>
+              <ul>
+                {this.state.filteredList.map((letter, i) => <Letter key={i}
+                                                                    letter={letter}
+                                                                    showDetailView={this.handleLetterDetail}/>)}
+              </ul>
+              <LetterDetailView detailState={this.state.detailState}/>
+              <div>
+                <ul>
+                  {this.state.filteredRedditPosts.map((post, idx) => {
+                    return (<Row key={idx}>
+                      <RedditPostListItem post={post}/>
+                    </Row>);
+                  })}
+                </ul>
+              </div>
+              <div>
+                <Link to="/swoogity">This is a link</Link>
+              </div>
+            </div>
+          </Route>
+        </div>
       </Router>
     );
   }
