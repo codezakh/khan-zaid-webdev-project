@@ -3,6 +3,7 @@ import $ from 'jquery/src/jquery';
 import Keys from './App.config';
 import request from 'request-promise-native/lib/rp';
 import 'reddit.js/reddit'
+import {parsePosts} from './RedditParser';
 
 class App extends Component {
   constructor(props) {
@@ -50,8 +51,9 @@ class App extends Component {
   };
 
   downloadRedditData() {
-    window.reddit.top('deepfriedmemes').t('all').limit(1).fetch(function(res){
-      console.log(res.data.children[0].data.url);
+    var self = this;
+    window.reddit.top('deepfriedmemes').t('all').limit(20).fetch(function(res){
+      self.setState({redditPosts: parsePosts(res)});
     })
   };
 
@@ -70,6 +72,13 @@ class App extends Component {
                                                               showDetailView={this.handleLetterDetail}/>)}
         </ul>
         <LetterDetailView detailState={this.state.detailState}/>
+        <div>
+          <ul>
+            {this.state.redditPosts.map((post, idx) => {
+              return <RedditPostListItem post={post} key={idx}/>
+            })}
+          </ul>
+        </div>
       </div>
     );
   }
@@ -99,6 +108,18 @@ const Letter = ({letter, showDetailView}) => (
     </div>
   </li>
 )
+
+const RedditPostListItem = ({post}) => (
+  <li>
+    <div id="{post.id}" onClick={() => console.log(post.id, 'clicked')}>
+      <h1>{post.title}</h1>
+      <img alt="reddit thumbnail"
+           src={post.thumbnail}
+           width="{post.thumbnail_width}"
+           height="{post.thumbnail_height}"/>
+    </div>
+  </li>
+);
 
 
 const SearchBar = ({search}) => {
