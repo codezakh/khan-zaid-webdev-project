@@ -4,7 +4,7 @@ import Keys from './App.config';
 import 'reddit.js/reddit'
 import {parsePosts} from './RedditParser';
 import {Button, Row} from 'react-bootstrap';
-import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
+import { BrowserRouter as Router, Route,} from 'react-router-dom'
 import JSONPretty from 'react-json-pretty';
 import {find} from 'lodash';
 
@@ -12,17 +12,12 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      sampleList: ['a', 'b', 'c', 'd'],
-      filteredList : ['a','b','c','d'],
-      detailState: {detailInView: false, letterInView:undefined},
       redditPosts: [],
       filteredRedditPosts: [],
       notFound: {'404': 'Not found'},
     };
 
-    this.handleSearch = this.handleSearch.bind(this);
     this.handleMemeSearch = this.handleMemeSearch.bind(this);
-    this.handleLetterDetail = this.handleLetterDetail.bind(this);
     this.downloadRedditData = this.downloadRedditData.bind(this);
     this.getDetailPost = this.getDetailPost.bind(this);
   };
@@ -30,36 +25,6 @@ class App extends Component {
   getDetailPost(postId) {
     return find(this.state.redditPosts, {id: postId}) || this.state.notFound;
   }
-
-  handleLetterDetail(letter) {
-    let {detailInView, letterInView} = this.state.detailState;
-    if (detailInView && letter === letterInView) {
-      console.log('Toggling letters')
-      this.setState({
-        detailState: {
-          detailInView: false,
-          letterInView: undefined
-        }
-      });
-    } else if (detailInView && letter !== letterInView) {
-      console.log('switching letters');
-      this.setState({detailState: {detailInView: true, letterInView: letter}});
-    } else if (!detailInView) {
-      console.log('switching on')
-      this.setState({detailState: {detailInView: true, letterInView: letter}});
-    }
-  }
-
-  handleSearch(filterValue) {
-    if (filterValue){
-      let filteredList = this.state.sampleList.filter((listItem) => {
-        return listItem === filterValue;
-      });
-      this.setState({filteredList: filteredList});
-    } else {
-      this.setState({filteredList: this.state.sampleList});
-    }
-  };
 
   handleMemeSearch(searchValue) {
     if (searchValue){
@@ -74,7 +39,7 @@ class App extends Component {
 
   downloadRedditData() {
     var self = this;
-    window.reddit.top('deepfriedmemes').t('all').limit(20).fetch(function(res){
+    window.reddit.top('surrealmemes').t('all').limit(20).fetch(function(res){
       self.setState({redditPosts: parsePosts(res)});
       self.setState({filteredRedditPosts: parsePosts(res)});
     })
@@ -89,64 +54,31 @@ class App extends Component {
     return (
       <Router>
         <div>
-        <div>
-          <Route path="/swoogity/:postId" render={(match) => (
-            <RedditPostDetailView getPost={this.getDetailPost} match={match}/>
-          )}/>
-        </div>
+          <div>
+            <Route path="/swoogity/:postId" render={(match) => (
+              <RedditPostDetailView getPost={this.getDetailPost} match={match}/>
+            )}/>
+          </div>
           <Route exact path="/" render={() => (
             <div>
               <SearchBar search={this.handleMemeSearch}/>
-              <ul>
-                {this.state.filteredList.map((letter, i) => <Letter key={i}
-                                                                    letter={letter}
-                                                                    showDetailView={this.handleLetterDetail}/>)}
-              </ul>
-              <LetterDetailView detailState={this.state.detailState}/>
               <div>
                 <ul>
                   {this.state.filteredRedditPosts.map((post, idx) => {
                     return (<Row key={idx}>
-                      <RedditPostListItem post={post} setDetailPost={this.setDetailPost}/>
+                      <RedditPostListItem post={post}
+                                          setDetailPost={this.setDetailPost}/>
                     </Row>);
                   })}
                 </ul>
               </div>
-              <div>
-                <Link to="/swoogity">This is a link</Link>
-              </div>
             </div>
-          )}>
-          </Route>
+          )}/>
         </div>
       </Router>
     );
   }
 }
-
-const LetterDetailView = ({detailState}) => {
-  let {detailInView, letterInView} = detailState;
-  if (detailInView) {
-    return (
-      <div>
-        You have truly been sprongled by "{letterInView}" my man
-      </div>
-    )
-  } else {
-    return (
-      <div></div>
-    );
-  }
-};
-
-
-const Letter = ({letter, showDetailView}) => (
-  <li>
-    <div id="{letter}" onClick={() => showDetailView(letter)}>
-      {letter}
-    </div>
-  </li>
-)
 
 const RedditPostListItem = ({post, setDetailPost}) => (
   <li>
@@ -166,7 +98,7 @@ const RedditPostListItem = ({post, setDetailPost}) => (
   </li>
 );
 
-const RedditPostDetailView = function({getPost, match}) {
+const RedditPostDetailView = ({getPost, match}) => {
   let postId = match.match.params.postId;
   let post = getPost(postId);
   return (
@@ -186,20 +118,6 @@ const SearchBar = ({search}) => {
     </input>
   );
 };
-
-const Meme = ({memeUrl, memeText, displayTitle}) => (
-  <div>
-    <h1>{displayTitle}</h1>
-    <p>{memeText}</p>
-    <img src={memeUrl} alt={memeText}/>
-  </div>
-);
-
-const StupidComponent = () => (
-  <div>
-    <h1>Just destroy me</h1>
-  </div>
-);
 
 
 const processMeme = (memeUrl) => {
