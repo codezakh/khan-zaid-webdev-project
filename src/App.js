@@ -3,7 +3,7 @@ import $ from 'jquery';
 import Keys from './App.config';
 import 'reddit.js/reddit'
 import {parsePosts} from './RedditParser';
-import {Button, Row} from 'react-bootstrap';
+import {Button, Row, Grid, FormControl} from 'react-bootstrap';
 import { BrowserRouter as Router, Route,} from 'react-router-dom'
 import JSONPretty from 'react-json-pretty';
 import {find} from 'lodash';
@@ -53,28 +53,31 @@ class App extends Component {
   render() {
     return (
       <Router>
-        <div>
-          <div>
-            <Route path="/swoogity/:postId" render={(match) => (
-              <RedditPostDetailView getPost={this.getDetailPost} match={match}/>
+        <Grid fluid="true">
+          <div className="center-me">
+            <div>
+              <Route path="/swoogity/:postId" render={(match) => (
+                <RedditPostDetailView getPost={this.getDetailPost}
+                                      match={match}/>
+              )}/>
+            </div>
+            <Route exact path="/" render={() => (
+              <div>
+                <SearchBar search={this.handleMemeSearch}/>
+                <div>
+                  <ul>
+                    {this.state.filteredRedditPosts.map((post, idx) => {
+                      return (<Row key={idx}>
+                        <RedditPostListItem post={post}
+                                            setDetailPost={this.setDetailPost}/>
+                      </Row>);
+                    })}
+                  </ul>
+                </div>
+              </div>
             )}/>
           </div>
-          <Route exact path="/" render={() => (
-            <div>
-              <SearchBar search={this.handleMemeSearch}/>
-              <div>
-                <ul>
-                  {this.state.filteredRedditPosts.map((post, idx) => {
-                    return (<Row key={idx}>
-                      <RedditPostListItem post={post}
-                                          setDetailPost={this.setDetailPost}/>
-                    </Row>);
-                  })}
-                </ul>
-              </div>
-            </div>
-          )}/>
-        </div>
+        </Grid>
       </Router>
     );
   }
@@ -111,11 +114,12 @@ const RedditPostDetailView = ({getPost, match}) => {
 
 const SearchBar = ({search}) => {
   return (
-    <input id="memeSearchBox"
+    <FormControl id="memeSearchBox"
            type="text"
+                 placeholder="search by post title"
            onKeyUp={(event) => search($('#memeSearchBox').val())}>
 
-    </input>
+    </FormControl>
   );
 };
 
