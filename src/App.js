@@ -5,7 +5,8 @@ import 'reddit.js/reddit'
 import {parsePosts} from './RedditParser';
 import {Button, Row} from 'react-bootstrap';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
-
+import JSONPretty from 'react-json-pretty';
+import {find} from 'lodash';
 
 class App extends Component {
   constructor(props) {
@@ -16,13 +17,19 @@ class App extends Component {
       detailState: {detailInView: false, letterInView:undefined},
       redditPosts: [],
       filteredRedditPosts: [],
+      notFound: {'404': 'Not found'},
     };
 
     this.handleSearch = this.handleSearch.bind(this);
     this.handleMemeSearch = this.handleMemeSearch.bind(this);
     this.handleLetterDetail = this.handleLetterDetail.bind(this);
     this.downloadRedditData = this.downloadRedditData.bind(this);
+    this.getDetailPost = this.getDetailPost.bind(this);
   };
+
+  getDetailPost(postId) {
+    return find(this.state.redditPosts, {id: postId}) || this.state.notFound;
+  }
 
   handleLetterDetail(letter) {
     let {detailInView, letterInView} = this.state.detailState;
@@ -83,7 +90,9 @@ class App extends Component {
       <Router>
         <div>
         <div>
-          <Route path="/swoogity" component={StupidComponent}></Route>
+          <Route path="/swoogity/:postId" render={(match) => (
+            <RedditPostDetailView getPost={this.getDetailPost} match={match}/>
+          )}/>
         </div>
           <Route exact path="/" render={() => (
             <div>
@@ -98,7 +107,7 @@ class App extends Component {
                 <ul>
                   {this.state.filteredRedditPosts.map((post, idx) => {
                     return (<Row key={idx}>
-                      <RedditPostListItem post={post}/>
+                      <RedditPostListItem post={post} setDetailPost={this.setDetailPost}/>
                     </Row>);
                   })}
                 </ul>
@@ -139,7 +148,7 @@ const Letter = ({letter, showDetailView}) => (
   </li>
 )
 
-const RedditPostListItem = ({post}) => (
+const RedditPostListItem = ({post, setDetailPost}) => (
   <li>
     <div id="{post.id}" onClick={() => console.log(post.id, 'clicked')}>
       <h1>{post.title}</h1>
@@ -149,13 +158,23 @@ const RedditPostListItem = ({post}) => (
            height="{post.thumbnail_height}"/>
 
       <div>
-        <a href="/swoogity">
+        <a href={`/swoogity/${post.id}`}>
           <Button bsStyle="primary">Detail</Button>
         </a>
       </div>
     </div>
   </li>
 );
+
+const RedditPostDetailView = function({getPost, match}) {
+  let postId = match.match.params.postId;
+  let post = getPost(postId);
+  return (
+    <div>
+      <JSONPretty id="json-pretty" json={post}/>
+    </div>
+  );
+};
 
 
 const SearchBar = ({search}) => {
