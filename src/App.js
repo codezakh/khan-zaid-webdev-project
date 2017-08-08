@@ -39,7 +39,7 @@ class App extends Component {
 
   downloadRedditData() {
     var self = this;
-    window.reddit.top('surrealmemes').t('all').limit(20).fetch(function(res){
+    window.reddit.top('historymemes').t('all').limit(20).fetch(function(res){
       self.setState({redditPosts: parsePosts(res)});
       self.setState({filteredRedditPosts: parsePosts(res)});
     })
